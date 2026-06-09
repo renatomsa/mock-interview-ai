@@ -112,14 +112,14 @@ export default function Interview() {
 
   return (
     <main className="min-h-screen bg-[#0A0A0A] flex flex-col">
-      <header className="px-8 pt-8 pb-6 flex items-center justify-between border-b border-[#262626]">
+      <header className="px-4 md:px-8 pt-6 md:pt-8 pb-6 flex items-center justify-between border-b border-[#262626]">
         <span className="text-xs tracking-widest uppercase font-sans text-[#737373]">
           Mock Interview AI
         </span>
         <ProgressIndicator phase={phase} behavioralIndex={behavioralIndex} />
       </header>
 
-      <div className="flex-1 p-8">
+      <div className="flex-1 p-4 md:p-8">
         {phase === 'behavioral' && (
           <BehavioralQuestion
             question={session.behavioralQuestions![behavioralIndex]}

@@ -27,7 +27,7 @@ export default function BehavioralQuestion({
 }: Props) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
-      <div className="border border-[#262626] p-8 flex flex-col">
+      <div className="border border-[#262626] p-4 md:p-8 flex flex-col">
         <span className="text-xs tracking-widest uppercase text-[#737373] font-sans mb-6">
           Question {questionNumber} of 3
         </span>
@@ -35,7 +35,7 @@ export default function BehavioralQuestion({
         <p className="text-xs text-[#737373] mt-auto pt-8 leading-relaxed">{hints[language]}</p>
       </div>
 
-      <div className="border border-[#262626] p-8 flex flex-col">
+      <div className="border border-[#262626] p-4 md:p-8 flex flex-col">
         <span className="text-xs tracking-widest uppercase text-[#737373] font-sans mb-6">
           {responseLabel[language]}
         </span>

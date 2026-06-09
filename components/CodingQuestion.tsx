@@ -39,7 +39,7 @@ export default function CodingQuestion({ question, onSubmit, isProcessing, langu
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
-      <div className="border border-[#262626] p-8 overflow-y-auto flex flex-col gap-6">
+      <div className="border border-[#262626] p-4 md:p-8 overflow-y-auto flex flex-col gap-6">
         <div className="flex items-start justify-between gap-4">
           <span className="text-xs tracking-widest uppercase text-[#737373] font-sans">{t.tag}</span>
           <span className="text-xs font-mono text-[#737373] shrink-0">{question.topic}</span>
@@ -94,7 +94,7 @@ export default function CodingQuestion({ question, onSubmit, isProcessing, langu
         </div>
       </div>
 
-      <div className="border border-[#262626] p-8 flex flex-col">
+      <div className="border border-[#262626] p-4 md:p-8 flex flex-col">
         <span className="text-xs tracking-widest uppercase text-[#737373] font-sans mb-6">
           {t.explanation}
         </span>

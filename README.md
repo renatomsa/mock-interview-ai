@@ -1,36 +1,128 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mock Interview AI
 
-## Getting Started
+A structured technical interview simulator that evaluates candidates across behavioral and coding dimensions. Built as a class project for Media & Interactions.
 
-First, run the development server:
+---
+
+## What it does
+
+Candidates complete a two-phase interview:
+
+1. **Behavioral** — Three audio-recorded questions. The browser captures speech via the MediaRecorder API, OpenAI Whisper transcribes it, and GPT-4o scores the response on STAR structure, clarity, and relevance.
+2. **Coding** — One LeetCode-style problem generated at the candidate's level. The candidate explains their approach in plain text; GPT-4o evaluates understanding, problem-solving process, and edge-case awareness.
+
+After both phases, a final report synthesizes all scores into an overall rating, a hire verdict, and concrete study recommendations.
+
+No account required. No data persists — all session state lives in `sessionStorage` and is discarded when the tab closes.
+
+---
+
+## Tech stack
+
+| Layer | Choice |
+|---|---|
+| Framework | Next.js 16.2.7 (App Router) |
+| Language | TypeScript |
+| Styles | Tailwind CSS v4 |
+| Audio transcription | OpenAI Whisper (`whisper-1`) |
+| Evaluation & generation | GPT-4o, GPT-4o-mini |
+| Hosting | Vercel (serverless functions) |
+
+All OpenAI calls happen server-side in Next.js route handlers. The API key is never exposed to the client.
+
+---
+
+## Interview flow
+
+```
+Landing (name, level, language)
+  └── Behavioral Q1 → record audio → transcript + scores
+  └── Behavioral Q2 → record audio → transcript + scores
+  └── Behavioral Q3 → record audio → transcript + scores
+      └── Transition summary screen
+          └── Coding question (generated for selected level)
+              └── Written explanation → scores
+                  └── Final feedback report
+```
+
+Levels: `junior` / `mid` / `senior` — difficulty calibrates both the coding question and evaluation expectations.
+
+Languages: Portuguese (PT) and English (EN) — all prompts and UI strings are bilingual.
+
+---
+
+## Local setup
+
+**Prerequisites:** Node.js 20+, an OpenAI API key.
+
+```bash
+git clone https://github.com/renatomsa/mock-interview-ai
+cd mock-interview-ai
+npm install
+```
+
+Create `.env.local` at the project root:
+
+```
+OPENAI_API_KEY=sk-...
+```
+
+Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project structure
 
-## Learn More
+```
+app/
+  page.tsx                 # Landing — name, level, language
+  interview/page.tsx       # Interview state machine
+  feedback/page.tsx        # Final report
+  api/
+    behavioral/route.ts    # Whisper transcription + GPT-4o evaluation
+    question/route.ts      # GPT-4o-mini coding question generation
+    feedback/route.ts      # GPT-4o coding eval + holistic report
 
-To learn more about Next.js, take a look at the following resources:
+components/
+  AudioRecorder.tsx        # Record / stop / re-record
+  BehavioralQuestion.tsx   # Question card + recorder
+  CodingQuestion.tsx       # Problem display + text input
+  FeedbackReport.tsx       # Report renderer with score bars
+  ProgressIndicator.tsx    # Phase tracker
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+lib/
+  openai.ts                # OpenAI client singleton
+  prompts.ts               # All prompt templates
+  questions.ts             # Behavioral question bank (8 questions, 3 drawn randomly)
+  session.ts               # sessionStorage helpers
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+types/index.ts             # Shared TypeScript types
+```
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deployment
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The project deploys to Vercel with zero configuration. Push to a connected repository and add `OPENAI_API_KEY` to the project's environment variables in the Vercel dashboard.
+
+```bash
+vercel --prod
+```
+
+---
+
+## Design notes
+
+The interface uses Instrument Serif for headings, DM Sans for body text, and JetBrains Mono for transcripts and code. All corners are flat (2–4px radius). Score bars render as monospace tick characters (`████░`) rather than gradient fills. No icon libraries — SVGs are written inline where needed.
+
+---
+
+## Team
+
+Built for Media & Interactions, UFPE.

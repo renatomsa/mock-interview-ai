@@ -38,6 +38,7 @@ export async function POST(req: NextRequest) {
       messages: [{ role: 'user', content: codingEvalPrompt(question, answer, language) }],
       response_format: { type: 'json_object' },
       temperature: 0,
+      seed: 7,
     })
 
     const analysis: CodingAnalysis = JSON.parse(completion.choices[0].message.content || '{}')

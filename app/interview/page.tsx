@@ -7,6 +7,7 @@ import BehavioralQuestion from '@/components/BehavioralQuestion'
 import CodingQuestion from '@/components/CodingQuestion'
 import ProgressIndicator from '@/components/ProgressIndicator'
 import ThemeToggle from '@/components/ThemeToggle'
+import HomeButton from '@/components/HomeButton'
 import type { InterviewPhase, BehavioralResult, CodingQuestion as CodingQuestionType } from '@/types'
 
 const transitionCopy = {
@@ -38,11 +39,12 @@ export default function Interview() {
     }
   }, [])
 
-  async function handleBehavioralSubmit(blob: Blob) {
+  async function handleBehavioralSubmit(answer: { audio?: Blob; text?: string }) {
     setIsProcessing(true)
     try {
       const formData = new FormData()
-      formData.append('audio', blob, 'recording.webm')
+      if (answer.audio) formData.append('audio', answer.audio, 'recording.webm')
+      if (answer.text != null) formData.append('text', answer.text)
       formData.append('question', session.behavioralQuestions![behavioralIndex])
       formData.append('language', session.language!)
 
@@ -118,6 +120,7 @@ export default function Interview() {
         </span>
         <div className="flex items-center gap-5">
           <ProgressIndicator phase={phase} behavioralIndex={behavioralIndex} />
+          <HomeButton language={lang} />
           <ThemeToggle />
         </div>
       </header>
@@ -127,7 +130,8 @@ export default function Interview() {
           <BehavioralQuestion
             question={session.behavioralQuestions![behavioralIndex]}
             questionNumber={behavioralIndex + 1}
-            onSubmit={handleBehavioralSubmit}
+            onSubmitAudio={(blob) => handleBehavioralSubmit({ audio: blob })}
+            onSubmitText={(text) => handleBehavioralSubmit({ text })}
             isProcessing={isProcessing}
             language={lang}
           />

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { getSession, clearSession } from '@/lib/session'
 import FeedbackReport from '@/components/FeedbackReport'
 import ThemeToggle from '@/components/ThemeToggle'
+import HomeButton from '@/components/HomeButton'
 import type { FeedbackResponse, InterviewSession } from '@/types'
 
 export default function Feedback() {
@@ -56,7 +57,10 @@ export default function Feedback() {
         <span className="text-xs tracking-widest uppercase font-sans text-muted">
           Mock Interview AI
         </span>
-        <ThemeToggle />
+        <div className="flex items-center gap-5">
+          <HomeButton language={lang} />
+          <ThemeToggle />
+        </div>
       </header>
 
       <div className="flex-1 px-4 md:px-8 py-12 md:py-16">

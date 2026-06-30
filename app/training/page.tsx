@@ -7,6 +7,7 @@ import BehavioralQuestion from '@/components/BehavioralQuestion'
 import CodingQuestion from '@/components/CodingQuestion'
 import ScoreBar from '@/components/ScoreBar'
 import ThemeToggle from '@/components/ThemeToggle'
+import HomeButton from '@/components/HomeButton'
 import { getCodingTopics, listCoding, getCodingById } from '@/lib/codingBank'
 import {
   getBehavioralCategories,
@@ -182,11 +183,12 @@ export default function Training() {
     }
   }
 
-  async function handleBehavioralSubmit(blob: Blob) {
+  async function handleBehavioralSubmit(answer: { audio?: Blob; text?: string }) {
     setIsProcessing(true)
     try {
       const formData = new FormData()
-      formData.append('audio', blob, 'recording.webm')
+      if (answer.audio) formData.append('audio', answer.audio, 'recording.webm')
+      if (answer.text != null) formData.append('text', answer.text)
       formData.append('question', behavioralText)
       formData.append('language', lang)
       const res = await fetch('/api/behavioral', { method: 'POST', body: formData })
@@ -250,6 +252,7 @@ export default function Training() {
               {t.backSubjects}
             </button>
           )}
+          <HomeButton language={lang} />
           <ThemeToggle />
         </div>
       </header>
@@ -358,7 +361,8 @@ export default function Training() {
             question={behavioralText}
             questionNumber={1}
             totalQuestions={undefined}
-            onSubmit={handleBehavioralSubmit}
+            onSubmitAudio={(blob) => handleBehavioralSubmit({ audio: blob })}
+            onSubmitText={(text) => handleBehavioralSubmit({ text })}
             isProcessing={isProcessing}
             language={lang}
           />

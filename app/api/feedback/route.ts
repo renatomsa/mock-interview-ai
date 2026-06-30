@@ -38,6 +38,7 @@ export async function POST(req: NextRequest) {
         ],
         response_format: { type: 'json_object' },
         temperature: 0,
+        seed: 7,
       })
       codingAnalysis = JSON.parse(codingCompletion.choices[0].message.content || '{}')
     }
@@ -59,6 +60,7 @@ export async function POST(req: NextRequest) {
       ],
       response_format: { type: 'json_object' },
       temperature: 0,
+      seed: 7,
     })
     const report = JSON.parse(reportCompletion.choices[0].message.content || '{}')
 

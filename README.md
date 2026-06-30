@@ -16,7 +16,7 @@ In both modes evaluation works the same way:
 1. **Behavioral** — Answer by **audio or text**. Audio is captured via the MediaRecorder API and transcribed by OpenAI Whisper; text answers are evaluated directly. Either way, GPT-4o scores the response on STAR structure, clarity, and relevance.
 2. **Coding** — LeetCode-style problems from a curated bank organized by subject, each at least 3 per subject, tagged `easy` or `difficult`. In Training the user picks freely; in Simulation a random problem is served (the user cannot choose). The candidate explains their approach in plain text — graded on the explanation, including edge cases, complexity, and tradeoffs, not on runnable code.
 
-All scores use a **0–5 scale** with an explicit rubric: empty, off-topic, or "I don't know" answers score 0. Evaluation calls run at `temperature: 0` with a fixed `seed` for deterministic, repeatable feedback (the benchmark verifies identical scores across repeated runs). The Simulation's final report synthesizes all scores into an overall rating, a hire verdict, specific strengths (with how to leverage them in interviews), and concrete study recommendations.
+All scores use a **0–5 scale** with an explicit rubric: empty, off-topic, or "I don't know" answers score 0 (enforced by a deterministic guard, no model call). Evaluation calls run at `temperature: 0` with a fixed `seed` for repeatable feedback. Note that `temperature: 0` + `seed` is best-effort, not bit-exact — gpt-4o can jitter by ±1 on borderline criteria — so the benchmark verifies scores are stable *within a small tolerance*, not strictly identical. The Simulation's final report synthesizes all scores into an overall rating, a hire verdict, specific strengths (with how to leverage them in interviews), and concrete study recommendations.
 
 No account required. No data persists — all session state lives in `sessionStorage` and is discarded when the tab closes.
 
@@ -60,7 +60,7 @@ Theme: light and dark, toggled in the header and persisted in `localStorage` (an
 
 ## Evaluation benchmark
 
-To verify the AI feedback is trustworthy, a benchmark script runs fixed sample answers through the real prompts and checks three things: **score calibration** (bad answers ~0, strong answers high), **strengths quality** (strong answers yield specific, non-generic strengths; empty answers yield none), and **determinism** (the same input scored 3× yields identical scores).
+To verify the AI feedback is trustworthy, a benchmark script runs fixed sample answers through the real prompts and checks three things: **score calibration** (bad answers ~0, strong answers high), **strengths quality** (strong answers yield specific, non-generic strengths; empty answers yield none), and **determinism** (the same input scored 3× stays stable within ±1 per criterion).
 
 ```bash
 npm run benchmark

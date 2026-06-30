@@ -7,7 +7,9 @@
  *      land in their expected band. Bad answers score ~0, strong ones high.
  *   2. Strengths quality — the strengths the model surfaces must be specific
  *      (not generic filler) and absent for empty answers.
- *   3. Determinism — the same input scored repeatedly must yield identical scores.
+ *   3. Determinism — the same input scored repeatedly must be stable within a
+ *      small tolerance (temperature 0 + seed is best-effort, not bit-exact, so
+ *      we allow at most ±1 per criterion and ≤0.5 spread on the average).
  *
  * Run with: `npm run benchmark` (requires OPENAI_API_KEY).
  */
@@ -212,9 +214,17 @@ async function section2Strengths() {
   row('final/strong → high overall', String(score), '>= 3.5', typeof score === 'number' && score >= 3.5)
 }
 
+// temperature:0 + seed is best-effort, not bit-exact (OpenAI only guarantees
+// reproducibility when the backend build is unchanged). gpt-4o can jitter by ±1
+// on borderline criteria, so we assert stability within a realistic tolerance
+// rather than strict equality: every criterion varies by at most 1 across runs,
+// and the average is stable within 0.5.
+const MAX_CRITERION_DELTA = 1
+const MAX_AVG_SPREAD = 0.5
+
 async function section3Determinism() {
-  console.log('\n3) Determinism (same input scored 3x → identical scores)\n')
-  console.log('check'.padEnd(40), 'result')
+  console.log('\n3) Determinism (same input scored 3x → stable within tolerance)\n')
+  console.log('check'.padEnd(30), 'maxΔ'.padEnd(6), 'expected'.padEnd(12), 'result')
   console.log('-'.repeat(64))
 
   const probes: { name: string; prompt: string }[] = [
@@ -222,13 +232,29 @@ async function section3Determinism() {
     { name: 'coding/strong stable', prompt: codingEvalPrompt(codingProblem, strongCoding, 'en') },
   ]
   for (const p of probes) {
-    const vecs: string[] = []
+    const runs: Record<string, number>[] = []
     for (let i = 0; i < 3; i++) {
       const r = await evalJSON(p.prompt)
-      vecs.push(JSON.stringify(r.scores))
+      runs.push(r.scores as Record<string, number>)
     }
-    const stable = vecs.every((v) => v === vecs[0])
-    row(p.name, stable ? 'yes' : 'no', 'identical', stable, vecs.join(' | '))
+    // Largest spread on any single criterion across the 3 runs.
+    const keys = Object.keys(runs[0])
+    const criterionDelta = Math.max(
+      ...keys.map((k) => {
+        const vals = runs.map((s) => s[k])
+        return Math.max(...vals) - Math.min(...vals)
+      })
+    )
+    const avgs = runs.map(avg)
+    const avgSpread = Math.max(...avgs) - Math.min(...avgs)
+    const pass = criterionDelta <= MAX_CRITERION_DELTA && avgSpread <= MAX_AVG_SPREAD
+    row(
+      p.name,
+      String(criterionDelta),
+      `<=${MAX_CRITERION_DELTA}, avg<=${MAX_AVG_SPREAD}`,
+      pass,
+      `avgΔ=${avgSpread.toFixed(2)} | ${runs.map((s) => JSON.stringify(s)).join(' | ')}`
+    )
   }
 }
 

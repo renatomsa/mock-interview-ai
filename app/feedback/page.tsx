@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSession, clearSession } from '@/lib/session'
 import FeedbackReport from '@/components/FeedbackReport'
+import ThemeToggle from '@/components/ThemeToggle'
 import type { FeedbackResponse, InterviewSession } from '@/types'
 
 export default function Feedback() {
@@ -50,35 +51,36 @@ export default function Feedback() {
   const tryAgainText = lang === 'pt' ? 'Nova Entrevista' : 'New Interview'
 
   return (
-    <main className="min-h-screen bg-[#0A0A0A] flex flex-col">
-      <header className="px-4 md:px-8 pt-6 md:pt-8 pb-6 flex items-center border-b border-[#262626]">
-        <span className="text-xs tracking-widest uppercase font-sans text-[#737373]">
+    <main className="min-h-screen bg-background flex flex-col">
+      <header className="px-4 md:px-8 pt-6 md:pt-8 pb-6 flex items-center justify-between border-b border-border">
+        <span className="text-xs tracking-widest uppercase font-sans text-muted">
           Mock Interview AI
         </span>
+        <ThemeToggle />
       </header>
 
-      <div className="flex-1 px-8 py-16">
+      <div className="flex-1 px-4 md:px-8 py-12 md:py-16">
         {error ? (
           <div className="max-w-lg mx-auto space-y-4">
-            <p className="text-sm text-[#737373]">{errorText}</p>
+            <p className="text-sm text-muted">{errorText}</p>
             <button
               onClick={generateReport}
-              className="text-sm text-[#F2EFE8] underline underline-offset-4 hover:text-[#D4C9B8] transition-colors"
+              className="text-sm text-text underline underline-offset-4 hover:text-accent transition-colors"
             >
               {retryText}
             </button>
           </div>
         ) : !report ? (
           <div className="flex items-center justify-center h-64">
-            <span className="font-mono text-sm text-[#737373]">{loadingText}</span>
+            <span className="font-mono text-sm text-muted">{loadingText}</span>
           </div>
         ) : (
           <div>
             <FeedbackReport report={report} session={session as Partial<InterviewSession>} />
-            <div className="max-w-2xl mx-auto mt-16 pt-8 border-t border-[#262626]">
+            <div className="max-w-2xl mx-auto mt-16 pt-8 border-t border-border">
               <button
                 onClick={handleTryAgain}
-                className="border border-[#262626] px-5 py-2.5 text-xs tracking-widest uppercase font-sans text-[#737373] hover:border-[#3A3A3A] hover:text-[#F2EFE8] transition-colors"
+                className="border border-border px-5 py-2.5 text-xs tracking-widest uppercase font-sans text-muted hover:border-border-strong hover:text-text transition-colors"
               >
                 {tryAgainText}
               </button>

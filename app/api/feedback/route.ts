@@ -22,17 +22,27 @@ export async function POST(req: NextRequest) {
       codingAnswer: string
     } = session
 
-    // Step 1: evaluate coding answer
-    const codingCompletion = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        { role: 'user', content: codingEvalPrompt(codingQuestion, codingAnswer, level, language) },
-      ],
-      response_format: { type: 'json_object' },
-    })
-    const codingAnalysis: CodingAnalysis = JSON.parse(
-      codingCompletion.choices[0].message.content || '{}'
-    )
+    // Step 1: evaluate coding answer. Deterministic guard for empty answers.
+    let codingAnalysis: CodingAnalysis
+    if ((codingAnswer ?? '').trim().length < 15) {
+      codingAnalysis = {
+        scores: { understanding: 0, approach: 0, accuracy: 0, edgeCases: 0, communication: 0 },
+        feedback:
+          language === 'pt'
+            ? 'Nenhuma explicação foi fornecida. Descreva sua abordagem, complexidade e casos extremos para ser avaliado.'
+            : 'No explanation was provided. Describe your approach, complexity, and edge cases to be evaluated.',
+      }
+    } else {
+      const codingCompletion = await openai.chat.completions.create({
+        model: 'gpt-4o',
+        messages: [
+          { role: 'user', content: codingEvalPrompt(codingQuestion, codingAnswer, level, language) },
+        ],
+        response_format: { type: 'json_object' },
+        temperature: 0,
+      })
+      codingAnalysis = JSON.parse(codingCompletion.choices[0].message.content || '{}')
+    }
 
     // Step 2: generate final report
     const reportCompletion = await openai.chat.completions.create({
@@ -51,6 +61,7 @@ export async function POST(req: NextRequest) {
         },
       ],
       response_format: { type: 'json_object' },
+      temperature: 0,
     })
     const report = JSON.parse(reportCompletion.choices[0].message.content || '{}')
 

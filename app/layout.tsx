@@ -23,6 +23,10 @@ export const metadata: Metadata = {
   description: 'Practice the interview. Own the outcome.',
 }
 
+// Applies the persisted theme to <html> before first paint to avoid a flash of
+// the wrong theme. Default is dark; only adds the `light` class when chosen.
+const themeScript = `(function(){try{if(localStorage.getItem('theme')==='light'){document.documentElement.classList.add('light')}}catch(e){}})();`
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -31,9 +35,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${dmSans.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-[#0A0A0A] text-[#F2EFE8] font-sans">{children}</body>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
+      <body className="min-h-full bg-background text-text font-sans">{children}</body>
     </html>
   )
 }

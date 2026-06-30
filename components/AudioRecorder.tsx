@@ -84,9 +84,9 @@ export default function AudioRecorder({ onSubmit, disabled = false }: AudioRecor
       <button
         onClick={startRecording}
         disabled={disabled}
-        className="flex items-center gap-3 border border-[#262626] px-5 py-3 text-xs tracking-widest uppercase font-sans text-[#F2EFE8] hover:border-[#3A3A3A] transition-colors disabled:opacity-40"
+        className="flex items-center gap-3 border border-border px-5 py-3 text-xs tracking-widest uppercase font-sans text-text hover:border-border-strong transition-colors disabled:opacity-40"
       >
-        <span className="w-3 h-3 rounded-full border border-[#F2EFE8] inline-block" />
+        <span className="w-3 h-3 rounded-full border border-text inline-block" />
         Record
       </button>
     )
@@ -97,29 +97,29 @@ export default function AudioRecorder({ onSubmit, disabled = false }: AudioRecor
       <div className="flex items-center gap-4">
         <button
           onClick={stopRecording}
-          className="flex items-center gap-3 border border-[#C84B4B] px-5 py-3 text-xs tracking-widest uppercase font-sans text-[#C84B4B] hover:border-[#C84B4B] transition-colors"
+          className="flex items-center gap-3 border border-danger px-5 py-3 text-xs tracking-widest uppercase font-sans text-danger hover:border-danger transition-colors"
         >
-          <span className="w-3 h-3 rounded-full bg-[#C84B4B] inline-block animate-pulse" />
+          <span className="w-3 h-3 rounded-full bg-danger inline-block animate-pulse" />
           Stop
         </button>
-        <span className="font-mono text-sm text-[#737373]">{formatTime(duration)}</span>
+        <span className="font-mono text-sm text-muted">{formatTime(duration)}</span>
       </div>
     )
   }
 
   return (
     <div className="flex items-center gap-5 flex-wrap">
-      <span className="font-mono text-sm text-[#737373]">Recorded — {formatTime(duration)}</span>
+      <span className="font-mono text-sm text-muted">Recorded — {formatTime(duration)}</span>
       <button
         onClick={resetRecording}
-        className="text-xs text-[#737373] underline underline-offset-4 hover:text-[#F2EFE8] transition-colors tracking-widest uppercase"
+        className="text-xs text-muted underline underline-offset-4 hover:text-text transition-colors tracking-widest uppercase"
       >
         Re-record
       </button>
       <button
         onClick={handleSubmit}
         disabled={disabled}
-        className="flex items-center gap-2 bg-[#F2EFE8] text-[#0A0A0A] border border-[#F2EFE8] px-5 py-2.5 text-xs tracking-widest uppercase font-sans font-medium hover:bg-[#D4C9B8] hover:border-[#D4C9B8] transition-colors disabled:opacity-40"
+        className="flex items-center gap-2 bg-text text-background border border-text px-5 py-2.5 text-xs tracking-widest uppercase font-sans font-medium hover:bg-accent hover:border-accent transition-colors disabled:opacity-40"
       >
         Submit
         <svg width="14" height="9" viewBox="0 0 14 9" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

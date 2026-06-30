@@ -6,6 +6,7 @@ import { getSession, saveSession } from '@/lib/session'
 import BehavioralQuestion from '@/components/BehavioralQuestion'
 import CodingQuestion from '@/components/CodingQuestion'
 import ProgressIndicator from '@/components/ProgressIndicator'
+import ThemeToggle from '@/components/ThemeToggle'
 import type { InterviewPhase, BehavioralResult, CodingQuestion as CodingQuestionType } from '@/types'
 
 const transitionCopy = {
@@ -111,12 +112,15 @@ export default function Interview() {
   const tc = transitionCopy[lang]
 
   return (
-    <main className="min-h-screen bg-[#0A0A0A] flex flex-col">
-      <header className="px-4 md:px-8 pt-6 md:pt-8 pb-6 flex items-center justify-between border-b border-[#262626]">
-        <span className="text-xs tracking-widest uppercase font-sans text-[#737373]">
+    <main className="min-h-screen bg-background flex flex-col">
+      <header className="px-4 md:px-8 pt-6 md:pt-8 pb-6 flex items-center justify-between border-b border-border">
+        <span className="text-xs tracking-widest uppercase font-sans text-muted">
           Mock Interview AI
         </span>
-        <ProgressIndicator phase={phase} behavioralIndex={behavioralIndex} />
+        <div className="flex items-center gap-5">
+          <ProgressIndicator phase={phase} behavioralIndex={behavioralIndex} />
+          <ThemeToggle />
+        </div>
       </header>
 
       <div className="flex-1 p-4 md:p-8">
@@ -132,14 +136,14 @@ export default function Interview() {
 
         {phase === 'transition' && (
           <div className="max-w-lg mx-auto pt-16 space-y-8">
-            <span className="text-xs tracking-widest uppercase text-[#737373] font-sans">
+            <span className="text-xs tracking-widest uppercase text-muted font-sans">
               {tc.label}
             </span>
-            <h2 className="font-serif text-2xl text-[#F2EFE8] leading-snug">{tc.heading}</h2>
-            <p className="text-sm text-[#737373] leading-relaxed">{tc.body}</p>
+            <h2 className="font-serif text-2xl text-text leading-snug">{tc.heading}</h2>
+            <p className="text-sm text-muted leading-relaxed">{tc.body}</p>
             <button
               onClick={handleProceedToCoding}
-              className="flex items-center gap-2 bg-[#F2EFE8] text-[#0A0A0A] border border-[#F2EFE8] px-6 py-3 text-xs tracking-widest uppercase font-sans font-medium hover:bg-[#D4C9B8] hover:border-[#D4C9B8] transition-colors"
+              className="flex items-center gap-2 bg-text text-background border border-text px-6 py-3 text-xs tracking-widest uppercase font-sans font-medium hover:bg-accent hover:border-accent transition-colors"
             >
               {tc.cta}
               <svg width="14" height="9" viewBox="0 0 14 9" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -151,7 +155,7 @@ export default function Interview() {
 
         {phase === 'coding' && !codingQuestion && (
           <div className="flex items-center justify-center h-64">
-            <span className="font-mono text-sm text-[#737373]">Generating problem...</span>
+            <span className="font-mono text-sm text-muted">Generating problem...</span>
           </div>
         )}
 

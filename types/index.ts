@@ -1,7 +1,10 @@
 export type Level = 'junior' | 'mid' | 'senior'
 export type Language = 'pt' | 'en'
+export type InterviewMode = 'training' | 'simulation'
 export type InterviewPhase = 'behavioral' | 'transition' | 'coding' | 'done'
 
+// All score fields are integers on a 0-5 scale, where 0 means absent/empty/
+// off-topic (see SCORING_RUBRIC in lib/prompts.ts).
 export interface BehavioralScores {
   starStructure: number
   clarity: number
@@ -43,6 +46,7 @@ export interface InterviewSession {
   candidateName: string
   level: Level
   language: Language
+  mode: InterviewMode
   behavioralQuestions: string[]
   behavioralResults: BehavioralResult[]
   codingQuestion: CodingQuestion | null

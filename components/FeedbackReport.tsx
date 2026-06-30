@@ -1,22 +1,9 @@
 import type { FeedbackResponse, InterviewSession, Language } from '@/types'
+import ScoreBar from './ScoreBar'
 
 interface Props {
   report: FeedbackResponse
   session: Partial<InterviewSession>
-}
-
-function ScoreBar({ label, score }: { label: string; score: number }) {
-  const bar = Array(5)
-    .fill(0)
-    .map((_, i) => (i < score ? '█' : '░'))
-    .join('')
-  return (
-    <div className="flex items-center gap-4">
-      <span className="text-xs text-[#737373] font-sans w-36 shrink-0">{label}</span>
-      <span className="font-mono text-sm text-[#F2EFE8] tracking-widest">{bar}</span>
-      <span className="font-mono text-xs text-[#737373]">{score} / 5</span>
-    </div>
-  )
 }
 
 const sectionLabels: Record<Language, Record<string, string>> = {
@@ -57,36 +44,36 @@ export default function FeedbackReport({ report, session }: Props) {
   const t = sectionLabels[lang]
 
   const verdictBorder =
-    report.verdict === 'Strong hire' ? 'border-[#F2EFE8] text-[#F2EFE8]' : 'border-[#3A3A3A] text-[#737373]'
+    report.verdict === 'Strong hire' ? 'border-text text-text' : 'border-border-strong text-muted'
 
   return (
     <div className="max-w-2xl mx-auto space-y-16">
       {/* Header */}
       <div className="space-y-5">
-        <span className="text-xs tracking-widest uppercase text-[#737373] font-sans">
+        <span className="text-xs tracking-widest uppercase text-muted font-sans">
           {session.candidateName} — {session.level}
         </span>
         <div className={`inline-block border px-4 py-2 text-xs tracking-widest uppercase font-sans ${verdictBorder}`}>
           {report.verdict}
         </div>
         <div className="pt-2">
-          <span className="font-serif text-8xl text-[#F2EFE8] leading-none">
+          <span className="font-serif text-7xl sm:text-8xl text-text leading-none">
             {report.overallScore.toFixed(1)}
           </span>
-          <span className="font-sans text-sm text-[#737373] ml-4">out of 5</span>
+          <span className="font-sans text-sm text-muted ml-4">out of 5</span>
         </div>
       </div>
 
       {/* Behavioral */}
       <section className="space-y-4">
-        <span className="text-xs tracking-widest uppercase text-[#737373] font-sans block">
+        <span className="text-xs tracking-widest uppercase text-muted font-sans block">
           {t.behavioral}
         </span>
-        <p className="text-sm text-[#F2EFE8] leading-relaxed">{report.behavioralSummary}</p>
+        <p className="text-sm text-text leading-relaxed">{report.behavioralSummary}</p>
         <div className="space-y-4">
           {session.behavioralResults?.map((r, i) => (
-            <div key={i} className="border border-[#262626] p-6 space-y-4">
-              <p className="text-xs text-[#737373] font-serif italic leading-relaxed">
+            <div key={i} className="border border-border p-6 space-y-4">
+              <p className="text-xs text-muted font-serif italic leading-relaxed">
                 &ldquo;{r.question}&rdquo;
               </p>
               <div className="space-y-2">
@@ -94,7 +81,7 @@ export default function FeedbackReport({ report, session }: Props) {
                 <ScoreBar label={t.clarity} score={r.scores.clarity} />
                 <ScoreBar label={t.relevance} score={r.scores.relevance} />
               </div>
-              <p className="text-xs text-[#737373] leading-relaxed border-t border-[#262626] pt-4">
+              <p className="text-xs text-muted leading-relaxed border-t border-border pt-4">
                 {r.feedback}
               </p>
             </div>
@@ -104,13 +91,13 @@ export default function FeedbackReport({ report, session }: Props) {
 
       {/* Coding */}
       <section className="space-y-4">
-        <span className="text-xs tracking-widest uppercase text-[#737373] font-sans block">
+        <span className="text-xs tracking-widest uppercase text-muted font-sans block">
           {t.coding}
         </span>
-        <p className="text-sm text-[#F2EFE8] leading-relaxed">{report.codingSummary}</p>
+        <p className="text-sm text-text leading-relaxed">{report.codingSummary}</p>
         {report.codingAnalysis && (
-          <div className="border border-[#262626] p-6 space-y-4">
-            <p className="text-xs text-[#737373] font-serif italic">
+          <div className="border border-border p-6 space-y-4">
+            <p className="text-xs text-muted font-serif italic">
               &ldquo;{session.codingQuestion?.title}&rdquo;
             </p>
             <div className="space-y-2">
@@ -120,7 +107,7 @@ export default function FeedbackReport({ report, session }: Props) {
               <ScoreBar label={t.edgeCases} score={report.codingAnalysis.scores.edgeCases} />
               <ScoreBar label={t.communication} score={report.codingAnalysis.scores.communication} />
             </div>
-            <p className="text-xs text-[#737373] leading-relaxed border-t border-[#262626] pt-4">
+            <p className="text-xs text-muted leading-relaxed border-t border-border pt-4">
               {report.codingAnalysis.feedback}
             </p>
           </div>
@@ -130,26 +117,26 @@ export default function FeedbackReport({ report, session }: Props) {
       {/* Strengths + Improvements */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
         <section className="space-y-4">
-          <span className="text-xs tracking-widest uppercase text-[#737373] font-sans block">
+          <span className="text-xs tracking-widest uppercase text-muted font-sans block">
             {t.strengths}
           </span>
           <ol className="space-y-4">
             {report.topStrengths.map((s, i) => (
-              <li key={i} className="flex gap-4 text-sm text-[#F2EFE8]">
-                <span className="font-mono text-[#737373] shrink-0">{String(i + 1).padStart(2, '0')}</span>
+              <li key={i} className="flex gap-4 text-sm text-text">
+                <span className="font-mono text-muted shrink-0">{String(i + 1).padStart(2, '0')}</span>
                 <span className="leading-relaxed">{s}</span>
               </li>
             ))}
           </ol>
         </section>
         <section className="space-y-4">
-          <span className="text-xs tracking-widest uppercase text-[#737373] font-sans block">
+          <span className="text-xs tracking-widest uppercase text-muted font-sans block">
             {t.improvements}
           </span>
           <ol className="space-y-4">
             {report.topImprovements.map((s, i) => (
-              <li key={i} className="flex gap-4 text-sm text-[#F2EFE8]">
-                <span className="font-mono text-[#737373] shrink-0">{String(i + 1).padStart(2, '0')}</span>
+              <li key={i} className="flex gap-4 text-sm text-text">
+                <span className="font-mono text-muted shrink-0">{String(i + 1).padStart(2, '0')}</span>
                 <span className="leading-relaxed">{s}</span>
               </li>
             ))}
@@ -159,13 +146,13 @@ export default function FeedbackReport({ report, session }: Props) {
 
       {/* Study Recommendations */}
       <section className="space-y-4">
-        <span className="text-xs tracking-widest uppercase text-[#737373] font-sans block">
+        <span className="text-xs tracking-widest uppercase text-muted font-sans block">
           {t.study}
         </span>
         <ol className="space-y-4">
           {report.studyRecommendations.map((s, i) => (
-            <li key={i} className="flex gap-4 text-sm text-[#F2EFE8]">
-              <span className="font-mono text-[#737373] shrink-0">{String(i + 1).padStart(2, '0')}</span>
+            <li key={i} className="flex gap-4 text-sm text-text">
+              <span className="font-mono text-muted shrink-0">{String(i + 1).padStart(2, '0')}</span>
               <span className="leading-relaxed">{s}</span>
             </li>
           ))}
@@ -174,7 +161,7 @@ export default function FeedbackReport({ report, session }: Props) {
 
       {/* Final Note */}
       <section>
-        <p className="font-serif italic text-[#F2EFE8] leading-relaxed text-base border-l-2 border-[#262626] pl-6">
+        <p className="font-serif italic text-text leading-relaxed text-base border-l-2 border-border pl-6">
           {report.finalNote}
         </p>
       </section>

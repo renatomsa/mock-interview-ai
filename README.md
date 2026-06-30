@@ -6,12 +6,17 @@ A structured technical interview simulator that evaluates candidates across beha
 
 ## What it does
 
-Candidates complete a two-phase interview:
+The app has two modes, chosen on the landing page:
 
-1. **Behavioral** — Three audio-recorded questions. The browser captures speech via the MediaRecorder API, OpenAI Whisper transcribes it, and GPT-4o scores the response on STAR structure, clarity, and relevance.
-2. **Coding** — One LeetCode-style problem generated at the candidate's level. The candidate explains their approach in plain text; GPT-4o evaluates understanding, problem-solving process, and edge-case awareness.
+- **Simulation** — a full mock interview: three audio-recorded behavioral questions, then one coding challenge, then a synthesized report.
+- **Training** — pick a subject (a coding topic or a behavioral category) and practice questions one at a time, with immediate feedback after each, and a "practice more of this subject" loop.
 
-After both phases, a final report synthesizes all scores into an overall rating, a hire verdict, and concrete study recommendations.
+In both modes evaluation works the same way:
+
+1. **Behavioral** — Audio-recorded answers. The browser captures speech via the MediaRecorder API, OpenAI Whisper transcribes it, and GPT-4o scores the response on STAR structure, clarity, and relevance.
+2. **Coding** — A LeetCode-style problem served from a curated, level-calibrated bank (with AI generation as a fallback). The candidate explains their approach in plain text — they are graded on the explanation, including edge cases, complexity, and tradeoffs, not on runnable code.
+
+All scores use a **0–5 scale** with an explicit rubric: empty, off-topic, or "I don't know" answers score 0. Evaluation calls run at `temperature: 0` for deterministic, repeatable feedback. The Simulation's final report synthesizes all scores into an overall rating, a hire verdict, specific strengths (with how to leverage them in interviews), and concrete study recommendations.
 
 No account required. No data persists — all session state lives in `sessionStorage` and is discarded when the tab closes.
 
@@ -49,6 +54,20 @@ Levels: `junior` / `mid` / `senior` — difficulty calibrates both the coding qu
 
 Languages: Portuguese (PT) and English (EN) — all prompts and UI strings are bilingual.
 
+Theme: light and dark, toggled in the header and persisted in `localStorage` (an inline script applies it before first paint to avoid flashing).
+
+---
+
+## Evaluation benchmark
+
+To verify the AI feedback is consistent with the rubric, a benchmark script runs fixed sample answers (empty, irrelevant, weak, strong) through the real prompts and asserts each lands in its expected score band — bad answers must score ~0, strong answers must score high.
+
+```bash
+npm run benchmark
+```
+
+Requires `OPENAI_API_KEY` (read from `.env.local`). It makes a handful of `gpt-4o` calls at `temperature: 0` and exits non-zero if any case falls outside its expected band. Use it after changing prompts in `lib/prompts.ts` to confirm scoring stays calibrated.
+
 ---
 
 ## Local setup
@@ -81,12 +100,14 @@ Open `http://localhost:3000`.
 
 ```
 app/
-  page.tsx                 # Landing — name, level, language
-  interview/page.tsx       # Interview state machine
+  page.tsx                 # Landing — mode, name, level, language
+  interview/page.tsx       # Simulation state machine
+  training/page.tsx        # Training mode — subject picker + per-question practice
   feedback/page.tsx        # Final report
   api/
     behavioral/route.ts    # Whisper transcription + GPT-4o evaluation
-    question/route.ts      # GPT-4o-mini coding question generation
+    question/route.ts      # Coding question from the bank (AI fallback)
+    coding/route.ts        # Single coding-answer evaluation (Training)
     feedback/route.ts      # GPT-4o coding eval + holistic report
 
 components/
@@ -94,14 +115,18 @@ components/
   BehavioralQuestion.tsx   # Question card + recorder
   CodingQuestion.tsx       # Problem display + text input
   FeedbackReport.tsx       # Report renderer with score bars
+  ScoreBar.tsx             # Shared 0–5 tick-bar score display
   ProgressIndicator.tsx    # Phase tracker
+  ThemeToggle.tsx          # Light/dark theme switch
 
 lib/
   openai.ts                # OpenAI client singleton
-  prompts.ts               # All prompt templates
-  questions.ts             # Behavioral question bank (8 questions, 3 drawn randomly)
+  prompts.ts               # All prompt templates + shared 0–5 rubric
+  questions.ts             # Categorized behavioral question bank
+  codingBank.ts            # Curated, level/topic coding question bank
   session.ts               # sessionStorage helpers
 
+scripts/benchmark.ts       # Evaluation calibration benchmark (npm run benchmark)
 types/index.ts             # Shared TypeScript types
 ```
 

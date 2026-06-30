@@ -5,6 +5,7 @@ import AudioRecorder from './AudioRecorder'
 interface Props {
   question: string
   questionNumber: number
+  totalQuestions?: number
   onSubmit: (blob: Blob) => void
   isProcessing: boolean
   language: 'pt' | 'en'
@@ -17,31 +18,36 @@ const hints = {
 
 const responseLabel = { en: 'Your Response', pt: 'Sua Resposta' }
 const processingLabel = { en: 'Processing...', pt: 'Processando...' }
+const questionLabel = (n: number, total: number | undefined, lang: 'pt' | 'en') => {
+  if (!total) return lang === 'pt' ? 'Pergunta' : 'Question'
+  return lang === 'pt' ? `Pergunta ${n} de ${total}` : `Question ${n} of ${total}`
+}
 
 export default function BehavioralQuestion({
   question,
   questionNumber,
+  totalQuestions = 3,
   onSubmit,
   isProcessing,
   language,
 }: Props) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
-      <div className="border border-[#262626] p-4 md:p-8 flex flex-col">
-        <span className="text-xs tracking-widest uppercase text-[#737373] font-sans mb-6">
-          Question {questionNumber} of 3
+      <div className="border border-border p-4 md:p-8 flex flex-col">
+        <span className="text-xs tracking-widest uppercase text-muted font-sans mb-6">
+          {questionLabel(questionNumber, totalQuestions, language)}
         </span>
-        <p className="font-serif text-xl leading-relaxed text-[#F2EFE8]">{question}</p>
-        <p className="text-xs text-[#737373] mt-auto pt-8 leading-relaxed">{hints[language]}</p>
+        <p className="font-serif text-xl sm:text-2xl leading-relaxed text-text">{question}</p>
+        <p className="text-xs sm:text-sm text-muted mt-auto pt-8 leading-relaxed">{hints[language]}</p>
       </div>
 
-      <div className="border border-[#262626] p-4 md:p-8 flex flex-col">
-        <span className="text-xs tracking-widest uppercase text-[#737373] font-sans mb-6">
+      <div className="border border-border p-4 md:p-8 flex flex-col">
+        <span className="text-xs tracking-widest uppercase text-muted font-sans mb-6">
           {responseLabel[language]}
         </span>
         <div className="mt-auto">
           {isProcessing ? (
-            <span className="font-mono text-sm text-[#737373]">{processingLabel[language]}</span>
+            <span className="font-mono text-sm text-muted">{processingLabel[language]}</span>
           ) : (
             <AudioRecorder onSubmit={onSubmit} disabled={isProcessing} />
           )}

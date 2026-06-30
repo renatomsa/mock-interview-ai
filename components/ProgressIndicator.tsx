@@ -11,16 +11,16 @@ export default function ProgressIndicator({ phase, behavioralIndex }: Props) {
 
   return (
     <div className="flex items-center gap-3 text-xs tracking-widest uppercase font-sans">
-      <span className={behavioralActive || codingActive ? 'text-[#F2EFE8]' : 'text-[#737373]'}>
+      <span className={behavioralActive || codingActive ? 'text-text' : 'text-muted'}>
         01 Behavioral
       </span>
       {phase === 'behavioral' && (
-        <span className="text-[#737373] font-mono normal-case tracking-normal">
+        <span className="text-muted font-mono normal-case tracking-normal">
           ({behavioralIndex + 1}/3)
         </span>
       )}
-      <span className="text-[#737373]">——</span>
-      <span className={codingActive ? 'text-[#F2EFE8]' : 'text-[#737373]'}>02 Coding</span>
+      <span className="text-muted">——</span>
+      <span className={codingActive ? 'text-text' : 'text-muted'}>02 Coding</span>
     </div>
   )
 }

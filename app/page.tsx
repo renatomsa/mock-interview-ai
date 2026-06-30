@@ -4,26 +4,39 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { saveSession } from '@/lib/session'
 import { getRandomQuestions } from '@/lib/questions'
-import type { Level, Language } from '@/types'
+import ThemeToggle from '@/components/ThemeToggle'
+import type { Level, Language, InterviewMode } from '@/types'
 
 const levels: Level[] = ['junior', 'mid', 'senior']
 
 const copy = {
   en: {
     tagline: 'Practice the interview.\nOwn the outcome.',
-    sub: 'Three behavioral questions by audio, then a coding challenge.\nHonest feedback on how you communicate and think.',
+    sub: 'Train on individual questions, or run a full recruitment simulation.\nHonest, deterministic feedback on how you communicate and think.',
+    modeLabel: 'Mode',
+    modes: {
+      training: { name: 'Training', desc: 'Pick a subject and practice questions one at a time, with feedback after each.' },
+      simulation: { name: 'Simulation', desc: 'A full mock interview: 3 behavioral questions by audio, then a coding challenge, then a report.' },
+    },
     levelLabel: 'Level',
     nameLabel: 'Your Name',
     namePlaceholder: 'Full name',
-    cta: 'Begin Interview',
+    ctaTraining: 'Start Training',
+    ctaSimulation: 'Begin Simulation',
   },
   pt: {
     tagline: 'Pratique a entrevista.\nDomine o resultado.',
-    sub: 'Três perguntas comportamentais por áudio, depois um desafio de código.\nFeedback honesto sobre como você comunica e raciocina.',
+    sub: 'Treine questões individuais, ou faça uma simulação completa de recrutamento.\nFeedback honesto e determinístico sobre como você comunica e raciocina.',
+    modeLabel: 'Modo',
+    modes: {
+      training: { name: 'Treino', desc: 'Escolha um assunto e pratique questões uma por vez, com feedback após cada uma.' },
+      simulation: { name: 'Simulação', desc: 'Entrevista completa: 3 perguntas comportamentais por áudio, depois um desafio de código e um relatório.' },
+    },
     levelLabel: 'Nível',
     nameLabel: 'Seu Nome',
     namePlaceholder: 'Nome completo',
-    cta: 'Iniciar Entrevista',
+    ctaTraining: 'Iniciar Treino',
+    ctaSimulation: 'Iniciar Simulação',
   },
 }
 
@@ -32,14 +45,29 @@ export default function Landing() {
   const [name, setName] = useState('')
   const [level, setLevel] = useState<Level | null>(null)
   const [language, setLanguage] = useState<Language>('en')
+  const [mode, setMode] = useState<InterviewMode>('simulation')
   const t = copy[language]
 
+  const needsName = mode === 'simulation'
+  const canStart = !!level && (!needsName || !!name.trim())
+
   function handleStart() {
-    if (!name.trim() || !level) return
+    if (!canStart) return
+    if (mode === 'training') {
+      saveSession({
+        candidateName: name.trim(),
+        level: level!,
+        language,
+        mode,
+      })
+      router.push('/training')
+      return
+    }
     saveSession({
       candidateName: name.trim(),
-      level,
+      level: level!,
       language,
+      mode,
       behavioralQuestions: getRandomQuestions(language),
       behavioralResults: [],
       codingQuestion: null,
@@ -50,20 +78,21 @@ export default function Landing() {
   }
 
   return (
-    <main className="min-h-screen bg-[#0A0A0A] flex flex-col">
-      <header className="px-8 pt-8">
-        <span className="text-xs tracking-widest uppercase font-sans text-[#737373]">
+    <main className="min-h-screen bg-background flex flex-col">
+      <header className="px-6 md:px-8 pt-8 flex items-center justify-between">
+        <span className="text-xs tracking-widest uppercase font-sans text-muted">
           Mock Interview AI
         </span>
+        <ThemeToggle />
       </header>
 
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-16">
-        <div className="w-full max-w-sm space-y-12">
+      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 sm:py-16">
+        <div className="w-full max-w-md space-y-10 sm:space-y-12">
           <div className="space-y-4">
-            <h1 className="font-serif text-4xl text-[#F2EFE8] leading-tight whitespace-pre-line">
+            <h1 className="font-serif text-4xl sm:text-5xl text-text leading-tight whitespace-pre-line">
               {t.tagline}
             </h1>
-            <p className="text-sm text-[#737373] leading-relaxed whitespace-pre-line">{t.sub}</p>
+            <p className="text-sm sm:text-base text-muted leading-relaxed whitespace-pre-line">{t.sub}</p>
           </div>
 
           <div className="space-y-8">
@@ -74,9 +103,7 @@ export default function Landing() {
                   key={lang}
                   onClick={() => setLanguage(lang)}
                   className={`text-xs tracking-widest uppercase font-sans transition-colors ${
-                    language === lang
-                      ? 'text-[#F2EFE8]'
-                      : 'text-[#737373] hover:text-[#F2EFE8]'
+                    language === lang ? 'text-text' : 'text-muted hover:text-text'
                   }`}
                 >
                   {lang.toUpperCase()}
@@ -84,9 +111,36 @@ export default function Landing() {
               ))}
             </div>
 
+            {/* Mode */}
+            <div className="space-y-3">
+              <span className="text-xs tracking-widest uppercase text-muted font-sans">
+                {t.modeLabel}
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {(['training', 'simulation'] as InterviewMode[]).map((m) => (
+                  <button
+                    key={m}
+                    onClick={() => setMode(m)}
+                    className={`border p-4 text-left transition-colors ${
+                      mode === m
+                        ? 'border-text'
+                        : 'border-border hover:border-border-strong'
+                    }`}
+                  >
+                    <span className={`block text-xs tracking-widest uppercase font-sans mb-2 ${mode === m ? 'text-text' : 'text-muted'}`}>
+                      {t.modes[m].name}
+                    </span>
+                    <span className="block text-xs sm:text-sm text-muted leading-relaxed">
+                      {t.modes[m].desc}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Level */}
             <div className="space-y-3">
-              <span className="text-xs tracking-widest uppercase text-[#737373] font-sans">
+              <span className="text-xs tracking-widest uppercase text-muted font-sans">
                 {t.levelLabel}
               </span>
               <div className="flex gap-3">
@@ -96,8 +150,8 @@ export default function Landing() {
                     onClick={() => setLevel(l)}
                     className={`flex-1 border py-3 text-xs tracking-widest uppercase font-sans transition-colors ${
                       level === l
-                        ? 'border-[#F2EFE8] text-[#F2EFE8]'
-                        : 'border-[#262626] text-[#737373] hover:border-[#3A3A3A] hover:text-[#F2EFE8]'
+                        ? 'border-text text-text'
+                        : 'border-border text-muted hover:border-border-strong hover:text-text'
                     }`}
                   >
                     {l}
@@ -106,28 +160,30 @@ export default function Landing() {
               </div>
             </div>
 
-            {/* Name */}
-            <div className="space-y-3">
-              <span className="text-xs tracking-widest uppercase text-[#737373] font-sans">
-                {t.nameLabel}
-              </span>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleStart()}
-                placeholder={t.namePlaceholder}
-                className="w-full bg-transparent border-b border-[#262626] pb-3 text-sm text-[#F2EFE8] placeholder:text-[#737373] focus:outline-none focus:border-[#3A3A3A] transition-colors font-sans"
-              />
-            </div>
+            {/* Name (simulation only) */}
+            {needsName && (
+              <div className="space-y-3">
+                <span className="text-xs tracking-widest uppercase text-muted font-sans">
+                  {t.nameLabel}
+                </span>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleStart()}
+                  placeholder={t.namePlaceholder}
+                  className="w-full bg-transparent border-b border-border pb-3 text-sm sm:text-base text-text placeholder:text-muted focus:outline-none focus:border-border-strong transition-colors font-sans"
+                />
+              </div>
+            )}
 
             {/* CTA */}
             <button
               onClick={handleStart}
-              disabled={!name.trim() || !level}
-              className="w-full bg-[#F2EFE8] text-[#0A0A0A] border border-[#F2EFE8] py-4 text-xs tracking-widest uppercase font-sans font-medium hover:bg-[#D4C9B8] hover:border-[#D4C9B8] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              disabled={!canStart}
+              className="w-full bg-text text-background border border-text py-4 text-xs tracking-widest uppercase font-sans font-medium hover:bg-accent hover:border-accent transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              {t.cta}
+              {mode === 'training' ? t.ctaTraining : t.ctaSimulation}
             </button>
           </div>
         </div>

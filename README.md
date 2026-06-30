@@ -9,12 +9,12 @@ A structured technical interview simulator that evaluates candidates across beha
 The app has two modes, chosen on the landing page:
 
 - **Simulation** — a full mock interview: three audio-recorded behavioral questions, then one coding challenge, then a synthesized report.
-- **Training** — pick a subject (a coding topic or a behavioral category) and practice questions one at a time, with immediate feedback after each, and a "practice more of this subject" loop.
+- **Training** — browse subjects (coding topics or behavioral categories) and freely pick the specific questions you want to practice, LeetCode-style, one at a time with immediate feedback after each.
 
 In both modes evaluation works the same way:
 
 1. **Behavioral** — Audio-recorded answers. The browser captures speech via the MediaRecorder API, OpenAI Whisper transcribes it, and GPT-4o scores the response on STAR structure, clarity, and relevance.
-2. **Coding** — A LeetCode-style problem served from a curated, level-calibrated bank (with AI generation as a fallback). The candidate explains their approach in plain text — they are graded on the explanation, including edge cases, complexity, and tradeoffs, not on runnable code.
+2. **Coding** — LeetCode-style problems from a curated bank organized by subject, each at least 3 per subject, tagged `easy` or `difficult`. In Training the user picks freely; in Simulation a random problem is served (the user cannot choose). The candidate explains their approach in plain text — graded on the explanation, including edge cases, complexity, and tradeoffs, not on runnable code.
 
 All scores use a **0–5 scale** with an explicit rubric: empty, off-topic, or "I don't know" answers score 0. Evaluation calls run at `temperature: 0` for deterministic, repeatable feedback. The Simulation's final report synthesizes all scores into an overall rating, a hire verdict, specific strengths (with how to leverage them in interviews), and concrete study recommendations.
 
@@ -40,17 +40,17 @@ All OpenAI calls happen server-side in Next.js route handlers. The API key is ne
 ## Interview flow
 
 ```
-Landing (name, level, language)
+Landing (mode, name, language)
   └── Behavioral Q1 → record audio → transcript + scores
   └── Behavioral Q2 → record audio → transcript + scores
   └── Behavioral Q3 → record audio → transcript + scores
       └── Transition summary screen
-          └── Coding question (generated for selected level)
+          └── Random coding question (easy or difficult)
               └── Written explanation → scores
                   └── Final feedback report
 ```
 
-Levels: `junior` / `mid` / `senior` — difficulty calibrates both the coding question and evaluation expectations.
+Difficulty: each coding question is `easy` or `difficult`. In Simulation it is random and cannot be chosen; in Training the user selects questions freely.
 
 Languages: Portuguese (PT) and English (EN) — all prompts and UI strings are bilingual.
 
@@ -100,7 +100,7 @@ Open `http://localhost:3000`.
 
 ```
 app/
-  page.tsx                 # Landing — mode, name, level, language
+  page.tsx                 # Landing — mode, name, language
   interview/page.tsx       # Simulation state machine
   training/page.tsx        # Training mode — subject picker + per-question practice
   feedback/page.tsx        # Final report
@@ -123,7 +123,7 @@ lib/
   openai.ts                # OpenAI client singleton
   prompts.ts               # All prompt templates + shared 0–5 rubric
   questions.ts             # Categorized behavioral question bank
-  codingBank.ts            # Curated, level/topic coding question bank
+  codingBank.ts            # Curated coding bank by subject (≥3 each) and difficulty
   session.ts               # sessionStorage helpers
 
 scripts/benchmark.ts       # Evaluation calibration benchmark (npm run benchmark)

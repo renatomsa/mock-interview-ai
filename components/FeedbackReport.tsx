@@ -51,7 +51,7 @@ export default function FeedbackReport({ report, session }: Props) {
       {/* Header */}
       <div className="space-y-5">
         <span className="text-xs tracking-widest uppercase text-muted font-sans">
-          {session.candidateName} — {session.level}
+          {session.candidateName}
         </span>
         <div className={`inline-block border px-4 py-2 text-xs tracking-widest uppercase font-sans ${verdictBorder}`}>
           {report.verdict}

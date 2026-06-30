@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { openai } from '@/lib/openai'
 import { codingEvalPrompt } from '@/lib/prompts'
-import type { CodingAnalysis, CodingQuestion, Language, Level } from '@/types'
+import type { CodingAnalysis, CodingQuestion, Language } from '@/types'
 
 // Evaluates a single coding explanation and returns only the CodingAnalysis.
 // Used by Training mode to give immediate per-question feedback.
@@ -10,16 +10,14 @@ export async function POST(req: NextRequest) {
     const {
       question,
       answer,
-      level,
       language,
     }: {
       question: CodingQuestion
       answer: string
-      level: Level
       language: Language
     } = await req.json()
 
-    if (!question || !level || !language) {
+    if (!question || !language) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
@@ -37,7 +35,7 @@ export async function POST(req: NextRequest) {
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o',
-      messages: [{ role: 'user', content: codingEvalPrompt(question, answer, level, language) }],
+      messages: [{ role: 'user', content: codingEvalPrompt(question, answer, language) }],
       response_format: { type: 'json_object' },
       temperature: 0,
     })

@@ -1,4 +1,4 @@
-import type { Language, Level, BehavioralResult, CodingQuestion, CodingAnalysis } from '@/types'
+import type { Language, BehavioralResult, CodingQuestion, CodingAnalysis, Difficulty } from '@/types'
 
 // Shared rubric anchor used across every evaluation prompt so that scoring is
 // consistent and deterministic. Each criterion is scored 0-5 with the SAME
@@ -19,14 +19,12 @@ Calibrate in BOTH directions:
 export function behavioralEvalPrompt(
   question: string,
   transcript: string,
-  level: Level,
   language: Language
 ): string {
   const lang = language === 'pt' ? 'Portuguese (Brazilian)' : 'English'
   return `You are a senior technical interviewer evaluating a candidate's behavioral interview response. Respond in ${lang}.
 
 Question asked: ${question}
-Candidate level: ${level}
 Transcript (from audio): ${transcript}
 
 ${SCORING_RUBRIC}
@@ -35,8 +33,6 @@ Evaluate this response on:
 1. STAR structure — did they provide Situation, Task, Action, Result? (0 = none of STAR present; 5 = all four clearly present)
 2. Clarity — was the response clear, organized, and easy to follow?
 3. Relevance — did they actually answer the question that was asked?
-
-Calibrate to the candidate level (${level}): hold senior candidates to a higher bar than juniors.
 
 The "strengths" must be SPECIFIC and tied to what the candidate actually said — quote or paraphrase their concrete example. Never generic ("good communication"); say WHAT was good and WHY. The "improvements" must be concrete and actionable.
 
@@ -54,17 +50,17 @@ Return ONLY valid JSON with no markdown:
 }
 
 export function codingQuestionPrompt(
-  level: Level,
   language: Language,
+  difficulty: Difficulty = 'difficult',
   usedTopics: string[] = []
 ): string {
-  const difficultyMap = { junior: 'easy', mid: 'medium', senior: 'hard' }
   const lang = language === 'pt' ? 'Portuguese (Brazilian)' : 'English'
+  const leetLevel = difficulty === 'easy' ? 'easy' : 'medium/hard'
   const avoid =
     usedTopics.length > 0
       ? `Avoid these topics already used: ${usedTopics.join(', ')}.`
       : ''
-  return `You are a technical interviewer. Generate a ${difficultyMap[level]} difficulty algorithm or data structure problem, similar to LeetCode ${difficultyMap[level]} problems. Write the problem in ${lang}. ${avoid}
+  return `You are a technical interviewer. Generate a ${difficulty} algorithm or data structure problem, similar to LeetCode ${leetLevel} problems. Write the problem in ${lang}. ${avoid}
 
 The candidate will explain their solution in plain text — no code execution required. Make the problem self-contained and unambiguous.
 
@@ -84,10 +80,12 @@ Return ONLY valid JSON with no markdown:
 export function codingEvalPrompt(
   question: CodingQuestion,
   answer: string,
-  level: Level,
   language: Language
 ): string {
   const lang = language === 'pt' ? 'Portuguese (Brazilian)' : 'English'
+  const difficultyNote = question.difficulty
+    ? `This is a ${question.difficulty} problem — calibrate expectations accordingly.`
+    : ''
   return `You are a technical interviewer evaluating a candidate's WRITTEN EXPLANATION of their solution. Respond in ${lang}.
 
 IMPORTANT: The candidate is NOT asked to write or run code. They are evaluated on the QUALITY OF THEIR EXPLANATION — including whether they discuss edge cases, time/space complexity, and tradeoffs, even when the problem statement did not explicitly ask for them, because that is what a real interviewer expects.
@@ -97,7 +95,7 @@ Score each criterion INDEPENDENTLY — do not let a weakness in one dimension dr
 Problem: ${question.title}
 ${question.description}
 Expected complexity — Time: ${question.expectedComplexity.time}, Space: ${question.expectedComplexity.space}
-Candidate level: ${level}
+${difficultyNote}
 
 Candidate's explanation:
 ${answer}
@@ -110,8 +108,6 @@ Evaluate on:
 3. Technical accuracy — is the described solution actually correct, including the stated complexity?
 4. Edge cases — did they explicitly identify and handle edge cases (empty input, duplicates, overflow, boundaries)?
 5. Communication — was the explanation clear, structured, and easy to follow?
-
-Calibrate to the candidate level (${level}). An empty, off-topic, or "I don't know" answer scores 0 across the board.
 
 Return ONLY valid JSON with no markdown:
 {
@@ -128,7 +124,6 @@ Return ONLY valid JSON with no markdown:
 
 export function finalFeedbackPrompt(
   candidateName: string,
-  level: Level,
   language: Language,
   behavioralResults: BehavioralResult[],
   codingQuestion: CodingQuestion,
@@ -147,12 +142,12 @@ export function finalFeedbackPrompt(
 
   return `You are a senior engineering manager providing post-interview feedback. Respond in ${lang}.
 
-Candidate: ${candidateName}, ${level} level
+Candidate: ${candidateName}
 
 Behavioral results (3 questions, scored 0-5):
 ${behavioralSummary}
 
-Coding problem: ${codingQuestion.title}
+Coding problem: ${codingQuestion.title}${codingQuestion.difficulty ? ` (${codingQuestion.difficulty})` : ''}
 Coding average score: ${codingAvg}/5
 Coding feedback: ${codingAnalysis.feedback}
 

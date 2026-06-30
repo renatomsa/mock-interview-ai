@@ -20,6 +20,8 @@ const labels = {
     evaluating: 'Saving...',
     examples: 'Examples',
     constraints: 'Constraints',
+    easy: 'Easy',
+    difficult: 'Difficult',
     evaluatedOn:
       'You are evaluated on your explanation — not on runnable code. Even if the problem does not ask for it, explicitly discuss: edge cases, time & space complexity, and the tradeoffs of your approach.',
   },
@@ -32,6 +34,8 @@ const labels = {
     evaluating: 'Salvando...',
     examples: 'Exemplos',
     constraints: 'Restrições',
+    easy: 'Fácil',
+    difficult: 'Difícil',
     evaluatedOn:
       'Você é avaliado pela sua explicação — não por código executável. Mesmo que o problema não peça, comente explicitamente: casos extremos, complexidade de tempo e espaço, e os trade-offs da sua abordagem.',
   },
@@ -46,7 +50,18 @@ export default function CodingQuestion({ question, onSubmit, isProcessing, langu
       <div className="border border-border p-4 md:p-8 overflow-y-auto flex flex-col gap-6">
         <div className="flex items-start justify-between gap-4">
           <span className="text-xs tracking-widest uppercase text-muted font-sans">{t.tag}</span>
-          <span className="text-xs font-mono text-muted shrink-0">{question.topic}</span>
+          <span className="flex items-center gap-3 shrink-0">
+            {question.difficulty && (
+              <span
+                className={`text-xs tracking-widest uppercase font-sans ${
+                  question.difficulty === 'easy' ? 'text-muted' : 'text-accent'
+                }`}
+              >
+                {question.difficulty === 'easy' ? t.easy : t.difficult}
+              </span>
+            )}
+            <span className="text-xs font-mono text-muted">{question.topic}</span>
+          </span>
         </div>
 
         <h2 className="font-serif text-xl sm:text-2xl text-text">{question.title}</h2>

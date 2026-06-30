@@ -51,7 +51,7 @@ They want to:
 - AI transcription and evaluation of all responses
 - Final structured feedback report
 - Bilingual interface: Portuguese and English
-- Three difficulty levels: Junior, Mid, Senior
+- Coding questions tagged easy or difficult; difficulty is random in Simulation and freely chosen in Training (no candidate "level")
 - Fully serverless — no account creation, no database
 
 ### Out of scope
@@ -95,8 +95,8 @@ Feedback
 
 ### 6.1 Landing Page
 
-- Candidate enters their name (text input)
-- Candidate selects difficulty level: Junior, Mid, or Senior
+- Candidate selects a mode: Training or Simulation
+- Candidate enters their name (Simulation only)
 - Candidate selects language: PT or EN
 - Upon submission, 3 behavioral questions are randomly selected from a bank of 8 and stored in session
 - Session is initialised in `sessionStorage`
@@ -127,7 +127,7 @@ Feedback
 ### 6.3 Coding Phase
 
 - A LeetCode-style algorithm question is served from a curated, level/topic-calibrated bank (`lib/codingBank.ts`); `gpt-4o-mini` generation is a fallback when a requested topic is not in the bank
-- Difficulty mapping: Junior → easy, Mid → medium, Senior → hard
+- Each question is tagged easy or difficult; in Simulation a random one is served (the candidate cannot choose)
 - Question format includes: title, description, 2–3 examples, constraints, expected time/space complexity
 - Candidate types their explanation and approach in a textarea (no code execution)
 - On submit: sent to `/api/behavioral` for evaluation by `gpt-4o`
@@ -183,7 +183,7 @@ Feedback
 ```typescript
 interface InterviewSession {
   candidateName: string
-  level: 'junior' | 'mid' | 'senior'
+  mode: 'training' | 'simulation'
   language: 'pt' | 'en'
   behavioralQuestions: string[]
   behavioralResults: Array<{
@@ -329,7 +329,7 @@ All API calls happen server-side. The key is never exposed to the client.
 - [ ] Transcription returns within 10 seconds for a 60-second recording
 - [ ] Feedback report renders all sections: scores, strengths, improvements, study topics, final note
 - [ ] All UI text renders correctly in both Portuguese and English
-- [ ] All three difficulty levels generate appropriate questions
+- [ ] Both easy and difficult questions are served and evaluated appropriately
 - [ ] Session data does not persist after tab is closed
 - [ ] No API key is exposed in client-side code or network responses
 - [ ] Application deploys to Vercel without build errors

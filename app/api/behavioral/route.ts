@@ -1,17 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { openai } from '@/lib/openai'
 import { behavioralEvalPrompt } from '@/lib/prompts'
-import type { Language, Level } from '@/types'
+import type { Language } from '@/types'
 
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData()
     const audio = formData.get('audio') as File
     const question = formData.get('question') as string
-    const level = formData.get('level') as Level
     const language = formData.get('language') as Language
 
-    if (!audio || !question || !level || !language) {
+    if (!audio || !question || !language) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
@@ -44,7 +43,7 @@ export async function POST(req: NextRequest) {
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o',
-      messages: [{ role: 'user', content: behavioralEvalPrompt(question, transcript, level, language) }],
+      messages: [{ role: 'user', content: behavioralEvalPrompt(question, transcript, language) }],
       response_format: { type: 'json_object' },
       temperature: 0,
     })

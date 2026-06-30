@@ -1,16 +1,15 @@
 import type { Language } from '@/types'
 
-// Behavioral bank, categorized so the user can practice a specific competency
-// in Training mode and so Simulation can sample across distinct categories.
+// Behavioral bank, categorized by competency. Every category has at least 3
+// questions so users can pick freely in Training and Simulation can sample
+// across distinct categories.
 export type BehavioralCategory =
-  | 'conflict'
   | 'pressure'
+  | 'conflict'
   | 'ownership'
-  | 'failure'
   | 'communication'
+  | 'growth'
   | 'collaboration'
-  | 'ambiguity'
-  | 'leadership'
 
 export interface BehavioralQuestion {
   id: string
@@ -19,6 +18,7 @@ export interface BehavioralQuestion {
 }
 
 export const behavioralBank: BehavioralQuestion[] = [
+  // ---- pressure ----
   {
     id: 'tech-challenge',
     category: 'pressure',
@@ -36,19 +36,47 @@ export const behavioralBank: BehavioralQuestion[] = [
     },
   },
   {
-    id: 'proud-contribution',
-    category: 'ownership',
+    id: 'production-incident',
+    category: 'pressure',
     text: {
-      en: "Tell me about a project you're proud of. What was your specific contribution, and what would have failed without you?",
-      pt: 'Me fale sobre um projeto do qual você tem orgulho. Qual foi a sua contribuição específica e o que teria falhado sem você?',
+      en: 'Tell me about a high-pressure production incident you were part of. What was your role, and how did you stay focused?',
+      pt: 'Me conte sobre um incidente em produção, de alta pressão, do qual você participou. Qual foi o seu papel e como você manteve o foco?',
     },
   },
+
+  // ---- conflict ----
   {
     id: 'technical-disagreement',
     category: 'conflict',
     text: {
       en: 'Tell me about a time you disagreed with a teammate on a technical approach. How did you reach a decision?',
       pt: 'Me conte sobre uma vez em que você discordou de um colega sobre uma abordagem técnica. Como vocês chegaram a uma decisão?',
+    },
+  },
+  {
+    id: 'pushback-on-lead',
+    category: 'conflict',
+    text: {
+      en: 'Describe a time you disagreed with a decision from your manager or lead. How did you handle it?',
+      pt: 'Descreva uma vez em que você discordou de uma decisão do seu gestor ou líder. Como você lidou com isso?',
+    },
+  },
+  {
+    id: 'code-review-tension',
+    category: 'conflict',
+    text: {
+      en: 'Tell me about a tense disagreement during a code review. How did you resolve it and keep the relationship intact?',
+      pt: 'Me conte sobre um desacordo tenso durante um code review. Como você resolveu e preservou a relação com a pessoa?',
+    },
+  },
+
+  // ---- ownership ----
+  {
+    id: 'proud-contribution',
+    category: 'ownership',
+    text: {
+      en: "Tell me about a project you're proud of. What was your specific contribution, and what would have failed without you?",
+      pt: 'Me fale sobre um projeto do qual você tem orgulho. Qual foi a sua contribuição específica e o que teria falhado sem você?',
     },
   },
   {
@@ -60,27 +88,21 @@ export const behavioralBank: BehavioralQuestion[] = [
     },
   },
   {
-    id: 'explain-nontechnical',
-    category: 'communication',
-    text: {
-      en: 'Tell me about a time you had to explain a complex technical concept to a non-technical stakeholder. How did you adapt?',
-      pt: 'Me conte sobre uma vez em que precisou explicar um conceito técnico complexo para alguém não técnico. Como você se adaptou?',
-    },
-  },
-  {
-    id: 'mistake-lesson',
-    category: 'failure',
-    text: {
-      en: 'Describe a significant mistake you made on a project. What was the impact, and what did you change afterward?',
-      pt: 'Descreva um erro significativo que você cometeu em um projeto. Qual foi o impacto e o que você mudou depois disso?',
-    },
-  },
-  {
     id: 'prioritization',
     category: 'ownership',
     text: {
       en: 'How do you decide what to work on when several urgent tasks compete for your time? Give a concrete recent example.',
       pt: 'Como você decide no que trabalhar quando várias tarefas urgentes competem pelo seu tempo? Dê um exemplo concreto recente.',
+    },
+  },
+
+  // ---- communication ----
+  {
+    id: 'explain-nontechnical',
+    category: 'communication',
+    text: {
+      en: 'Tell me about a time you had to explain a complex technical concept to a non-technical stakeholder. How did you adapt?',
+      pt: 'Me conte sobre uma vez em que precisou explicar um conceito técnico complexo para alguém não técnico. Como você se adaptou?',
     },
   },
   {
@@ -92,13 +114,41 @@ export const behavioralBank: BehavioralQuestion[] = [
     },
   },
   {
+    id: 'giving-feedback',
+    category: 'communication',
+    text: {
+      en: 'Describe a time you had to give difficult feedback to a teammate. How did you approach the conversation?',
+      pt: 'Descreva uma vez em que você teve que dar um feedback difícil a um colega. Como você conduziu a conversa?',
+    },
+  },
+
+  // ---- growth ----
+  {
+    id: 'mistake-lesson',
+    category: 'growth',
+    text: {
+      en: 'Describe a significant mistake you made on a project. What was the impact, and what did you change afterward?',
+      pt: 'Descreva um erro significativo que você cometeu em um projeto. Qual foi o impacto e o que você mudou depois disso?',
+    },
+  },
+  {
     id: 'unclear-requirements',
-    category: 'ambiguity',
+    category: 'growth',
     text: {
       en: 'Describe a situation where requirements were unclear or changing. How did you make progress despite the ambiguity?',
       pt: 'Descreva uma situação em que os requisitos eram pouco claros ou mudavam. Como você avançou apesar da ambiguidade?',
     },
   },
+  {
+    id: 'learn-fast',
+    category: 'growth',
+    text: {
+      en: 'Tell me about a time you had to learn a new technology quickly to deliver. How did you go about it?',
+      pt: 'Me conte sobre uma vez em que você teve que aprender uma nova tecnologia rapidamente para entregar. Como você fez isso?',
+    },
+  },
+
+  // ---- collaboration ----
   {
     id: 'help-teammate',
     category: 'collaboration',
@@ -109,23 +159,29 @@ export const behavioralBank: BehavioralQuestion[] = [
   },
   {
     id: 'drove-initiative',
-    category: 'leadership',
+    category: 'collaboration',
     text: {
       en: 'Describe a time you took the lead on something without being formally in charge. How did you get others on board?',
       pt: 'Descreva uma vez em que você liderou algo sem estar formalmente no comando. Como você conseguiu o apoio dos outros?',
     },
   },
+  {
+    id: 'cross-team',
+    category: 'collaboration',
+    text: {
+      en: 'Tell me about a project that required working closely with another team. What made the collaboration work, or not?',
+      pt: 'Me conte sobre um projeto que exigiu trabalhar de perto com outra equipe. O que fez a colaboração funcionar, ou não?',
+    },
+  },
 ]
 
 const CATEGORIES: BehavioralCategory[] = [
-  'conflict',
   'pressure',
+  'conflict',
   'ownership',
-  'failure',
   'communication',
+  'growth',
   'collaboration',
-  'ambiguity',
-  'leadership',
 ]
 
 function shuffle<T>(arr: T[]): T[] {
@@ -153,13 +209,14 @@ export function getRandomQuestions(language: Language): string[] {
   return picks.map((q) => q.text[language])
 }
 
-// Training: categories that actually have questions, for the subject picker.
+// Training: categories that have questions, for the subject picker.
 export function getBehavioralCategories(): BehavioralCategory[] {
   const present = new Set(behavioralBank.map((q) => q.category))
   return CATEGORIES.filter((c) => present.has(c))
 }
 
-export function getBehavioralByCategory(
+// Free selection — list questions in a category (localized).
+export function listBehavioral(
   category: BehavioralCategory,
   language: Language
 ): { id: string; text: string }[] {
@@ -168,15 +225,7 @@ export function getBehavioralByCategory(
     .map((q) => ({ id: q.id, text: q.text[language] }))
 }
 
-// Pick one question of a category, avoiding ids already practiced this session.
-export function getRandomBehavioral(
-  category: BehavioralCategory,
-  language: Language,
-  usedIds: string[] = []
-): { id: string; text: string } | null {
-  const pool = getBehavioralByCategory(category, language)
-  if (pool.length === 0) return null
-  const available = pool.filter((q) => !usedIds.includes(q.id))
-  const source = available.length > 0 ? available : pool
-  return source[Math.floor(Math.random() * source.length)]
+export function getBehavioralById(id: string, language: Language): string | null {
+  const found = behavioralBank.find((q) => q.id === id)
+  return found ? found.text[language] : null
 }

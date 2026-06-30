@@ -63,8 +63,8 @@ const CRITERIA: Record<Case['kind'], number> = { behavioral: 3, coding: 5 }
 
 function buildPrompt(c: Case): string {
   return c.kind === 'behavioral'
-    ? behavioralEvalPrompt(sampleQuestion, c.answer, 'mid', 'en')
-    : codingEvalPrompt(codingProblem, c.answer, 'junior', 'en')
+    ? behavioralEvalPrompt(sampleQuestion, c.answer, 'en')
+    : codingEvalPrompt(codingProblem, c.answer, 'en')
 }
 
 // Mirror of the API routes' deterministic guard.

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import { DM_Sans, Instrument_Serif, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 
@@ -38,10 +39,12 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${dmSans.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
-      <body className="min-h-full bg-background text-text font-sans">{children}</body>
+      <body className="min-h-full bg-background text-text font-sans">
+        <Script id="theme-init" strategy="beforeInteractive">
+          {themeScript}
+        </Script>
+        {children}
+      </body>
     </html>
   )
 }

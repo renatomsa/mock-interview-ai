@@ -1,21 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { openai } from '@/lib/openai'
 import { codingEvalPrompt, finalFeedbackPrompt } from '@/lib/prompts'
-import type { Level, Language, BehavioralResult, CodingQuestion, CodingAnalysis } from '@/types'
+import type { Language, BehavioralResult, CodingQuestion, CodingAnalysis } from '@/types'
 
 export async function POST(req: NextRequest) {
   try {
     const session = await req.json()
     const {
       candidateName,
-      level,
       language,
       behavioralResults,
       codingQuestion,
       codingAnswer,
     }: {
       candidateName: string
-      level: Level
       language: Language
       behavioralResults: BehavioralResult[]
       codingQuestion: CodingQuestion
@@ -36,7 +34,7 @@ export async function POST(req: NextRequest) {
       const codingCompletion = await openai.chat.completions.create({
         model: 'gpt-4o',
         messages: [
-          { role: 'user', content: codingEvalPrompt(codingQuestion, codingAnswer, level, language) },
+          { role: 'user', content: codingEvalPrompt(codingQuestion, codingAnswer, language) },
         ],
         response_format: { type: 'json_object' },
         temperature: 0,
@@ -52,7 +50,6 @@ export async function POST(req: NextRequest) {
           role: 'user',
           content: finalFeedbackPrompt(
             candidateName,
-            level,
             language,
             behavioralResults,
             codingQuestion,

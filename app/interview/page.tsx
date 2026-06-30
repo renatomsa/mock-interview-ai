@@ -33,7 +33,7 @@ export default function Interview() {
   const [codingQuestion, setCodingQuestion] = useState<CodingQuestionType | null>(null)
 
   useEffect(() => {
-    if (!session.candidateName || !session.level || !session.behavioralQuestions?.length) {
+    if (!session.candidateName || !session.behavioralQuestions?.length) {
       router.replace('/')
     }
   }, [])
@@ -44,7 +44,6 @@ export default function Interview() {
       const formData = new FormData()
       formData.append('audio', blob, 'recording.webm')
       formData.append('question', session.behavioralQuestions![behavioralIndex])
-      formData.append('level', session.level!)
       formData.append('language', session.language!)
 
       const res = await fetch('/api/behavioral', { method: 'POST', body: formData })
@@ -84,7 +83,7 @@ export default function Interview() {
       const res = await fetch('/api/question', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ level: session.level, language: session.language }),
+        body: JSON.stringify({ language: session.language }),
       })
       if (!res.ok) throw new Error('API error')
       const question: CodingQuestionType = await res.json()

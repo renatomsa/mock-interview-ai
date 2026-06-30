@@ -1,5 +1,5 @@
-export type Level = 'junior' | 'mid' | 'senior'
 export type Language = 'pt' | 'en'
+export type Difficulty = 'easy' | 'difficult'
 export type InterviewMode = 'training' | 'simulation'
 export type InterviewPhase = 'behavioral' | 'transition' | 'coding' | 'done'
 
@@ -26,6 +26,7 @@ export interface CodingQuestion {
   examples: Array<{ input: string; output: string; explanation?: string }>
   constraints: string[]
   topic: string
+  difficulty?: Difficulty
   expectedComplexity: { time: string; space: string }
 }
 
@@ -44,7 +45,6 @@ export interface CodingAnalysis {
 
 export interface InterviewSession {
   candidateName: string
-  level: Level
   language: Language
   mode: InterviewMode
   behavioralQuestions: string[]

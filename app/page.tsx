@@ -5,9 +5,7 @@ import { useRouter } from 'next/navigation'
 import { saveSession } from '@/lib/session'
 import { getRandomQuestions } from '@/lib/questions'
 import ThemeToggle from '@/components/ThemeToggle'
-import type { Level, Language, InterviewMode } from '@/types'
-
-const levels: Level[] = ['junior', 'mid', 'senior']
+import type { Language, InterviewMode } from '@/types'
 
 const copy = {
   en: {
@@ -15,10 +13,9 @@ const copy = {
     sub: 'Train on individual questions, or run a full recruitment simulation.\nHonest, deterministic feedback on how you communicate and think.',
     modeLabel: 'Mode',
     modes: {
-      training: { name: 'Training', desc: 'Pick a subject and practice questions one at a time, with feedback after each.' },
-      simulation: { name: 'Simulation', desc: 'A full mock interview: 3 behavioral questions by audio, then a coding challenge, then a report.' },
+      training: { name: 'Training', desc: 'Browse subjects and pick the questions you want to practice — one at a time, with feedback after each.' },
+      simulation: { name: 'Simulation', desc: 'A full mock interview: 3 behavioral questions by audio, then a random coding challenge, then a report.' },
     },
-    levelLabel: 'Level',
     nameLabel: 'Your Name',
     namePlaceholder: 'Full name',
     ctaTraining: 'Start Training',
@@ -29,10 +26,9 @@ const copy = {
     sub: 'Treine questões individuais, ou faça uma simulação completa de recrutamento.\nFeedback honesto e determinístico sobre como você comunica e raciocina.',
     modeLabel: 'Modo',
     modes: {
-      training: { name: 'Treino', desc: 'Escolha um assunto e pratique questões uma por vez, com feedback após cada uma.' },
-      simulation: { name: 'Simulação', desc: 'Entrevista completa: 3 perguntas comportamentais por áudio, depois um desafio de código e um relatório.' },
+      training: { name: 'Treino', desc: 'Navegue pelos assuntos e escolha as questões que quiser praticar — uma por vez, com feedback após cada uma.' },
+      simulation: { name: 'Simulação', desc: 'Entrevista completa: 3 perguntas comportamentais por áudio, depois um desafio de código aleatório e um relatório.' },
     },
-    levelLabel: 'Nível',
     nameLabel: 'Seu Nome',
     namePlaceholder: 'Nome completo',
     ctaTraining: 'Iniciar Treino',
@@ -43,20 +39,18 @@ const copy = {
 export default function Landing() {
   const router = useRouter()
   const [name, setName] = useState('')
-  const [level, setLevel] = useState<Level | null>(null)
   const [language, setLanguage] = useState<Language>('en')
   const [mode, setMode] = useState<InterviewMode>('simulation')
   const t = copy[language]
 
   const needsName = mode === 'simulation'
-  const canStart = !!level && (!needsName || !!name.trim())
+  const canStart = !needsName || !!name.trim()
 
   function handleStart() {
     if (!canStart) return
     if (mode === 'training') {
       saveSession({
         candidateName: name.trim(),
-        level: level!,
         language,
         mode,
       })
@@ -65,7 +59,6 @@ export default function Landing() {
     }
     saveSession({
       candidateName: name.trim(),
-      level: level!,
       language,
       mode,
       behavioralQuestions: getRandomQuestions(language),
@@ -133,28 +126,6 @@ export default function Landing() {
                     <span className="block text-xs sm:text-sm text-muted leading-relaxed">
                       {t.modes[m].desc}
                     </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Level */}
-            <div className="space-y-3">
-              <span className="text-xs tracking-widest uppercase text-muted font-sans">
-                {t.levelLabel}
-              </span>
-              <div className="flex gap-3">
-                {levels.map((l) => (
-                  <button
-                    key={l}
-                    onClick={() => setLevel(l)}
-                    className={`flex-1 border py-3 text-xs tracking-widest uppercase font-sans transition-colors ${
-                      level === l
-                        ? 'border-text text-text'
-                        : 'border-border text-muted hover:border-border-strong hover:text-text'
-                    }`}
-                  >
-                    {l}
                   </button>
                 ))}
               </div>
